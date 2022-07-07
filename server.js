@@ -141,3 +141,7 @@ function generateOrderNumber() {
 // app.get('/', (res,req,next) => {
 //     res.statusCode(200).send("GET recieved")
 // })
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../index.html'));
+  });

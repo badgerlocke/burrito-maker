@@ -25,7 +25,7 @@ for (a in ingredients) {
         allIngredients.push(ingredients[a][i]);
     }
 }
-
+console.log("Server: " + process.env.SERVER)
 app.listen((process.env.PORT || 3000), () => {
     console.log(`listening on ${process.env.PORT}`)
 })

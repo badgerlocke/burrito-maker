@@ -138,6 +138,6 @@ function generateOrderNumber() {
     return String(Math.floor(10000000*Math.random()))
 }
 
-app.get('/', (res,req,next) => {
-    res.statusCode(200).send("GET recieved")
-})
+// app.get('/', (res,req,next) => {
+//     res.statusCode(200).send("GET recieved")
+// })

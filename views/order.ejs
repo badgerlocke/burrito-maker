@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/style.css">
+        <title>Burrito Maker</title>
+    </head>
+    <body>
+        <h1>Your order is ready!</h1> 
+        <h6>Order number: <span id="order-num"><%= `${burrito.orderNum}`%></span></h6>
+        <!-- Check if burrito is cursed or uncursed -->
+        <% if (burrito.cursed) { %>
+            <h4><%= burrito.name %>, we made you a <span class="cursed">CURSED</span> burrito with:</h4>
+        <% } else {%>
+            <h4><%= burrito.name %>, we made you a burrito with:</h4>
+        <% } %>
+        <ul>
+            <% for(var i=0; i < burrito.ingredients.length; i++) { %>
+                <li class="ingredient">
+                    <span><%= burrito.ingredients[i] %></span>
+                </li>
+            <% } %>
+        </ul>
+        <h2><i>We hope you enjoy your meal!</i></h2>
+
+        <aside>
+            <h3>Not what you were hoping for? Your satisfaction is our #1 priority!</h3>
+            <!-- <form action="/burritoes" method="POST"></form> -->
+            <button id="remake-button">Remake order</button>
+
+            <button id="delete-button">Delete and go back to order menu</button>
+
+            <br>
+
+            <div id="message"></div>
+
+        </aside>
+        <script src="/main.js"></script>
+    </body>
+</html>

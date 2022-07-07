@@ -1,0 +1,13 @@
+*{
+    box-sizing: border-box;
+    background: black;
+    color: bisque;
+  }
+
+  ul {
+    color: lightskyblue
+  }
+
+  .cursed {
+    color: red;
+  }

@@ -1,6 +1,9 @@
 {
   "name": "burrito-maker",
   "version": "0.0.1",
+  "engines": {
+    "node": "12.x"
+  },
   "description": "Makes you a randomized burrito",
   "main": "server.js",
   "scripts": {

@@ -25,7 +25,7 @@ for (a in ingredients) {
         allIngredients.push(ingredients[a][i]);
     }
 }
-// console.log(allIngredients)
+
 
 app.listen(process.env.PORT, () => {
     console.log(`listening on ${process.env.PORT}`)
@@ -50,6 +50,14 @@ MongoClient.connect(process.env.SERVER)
             burritoesCollection.find().toArray()
                 .then(results => {
                     res.render('order.ejs', {burrito: results[results.length-1]}) 
+                })
+                .catch(error => console.error(error))
+        })
+
+        app.get('*', (req,res) => {
+            burritoesCollection.find().toArray()
+                .then(results => {
+                    res.render(path.join(__dirname, 'index.ejs'), {burritoes: results}) 
                 })
                 .catch(error => console.error(error))
         })

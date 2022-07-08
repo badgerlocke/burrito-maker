@@ -13,10 +13,10 @@
     <section>
         <form action="/burritoes" method="POST">
             <legend>How many ingredients would you like in your burrito?</legend>
-            <input type="text" placeholder="Your name" name="name">
-            <input type="text" placeholder="Number of ingredients" name="numIngredients">
+            <input type="text" placeholder="Your name" name="name" required pattern="^[\w\d]{1,}">
+            <input type="text" placeholder="Number of ingredients" name="numIngredients" required pattern="\d+">
             <p>Would you like to make it cursed?</p>
-            <input type="checkbox" name="cursed"><span>Yes</span>
+            <input type="checkbox" name="cursed" value="false"><span>Yes</span>
             <br>
             <br>
             <br>
@@ -30,7 +30,6 @@
         <ol>
             <% let max = burritoes.length %>
             <% for (let i=max-1; i > (max-5); i--) { %>
-                <% console.log(i) %>
                 <% if (burritoes[i].cursed) {  %>
                     <p><%= `A cursed burrito with ${burritoes[i].numIngredients} ingredients for ${burritoes[i].name}` %> </p>
                 <% } else { %>

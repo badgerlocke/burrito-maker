@@ -13,12 +13,10 @@ app.use(bodyParser.urlencoded({ extended: true}))
 app.use(bodyParser.json())
 app.set('view engine', 'ejs')
 // import ingredients from './ingredients.json' assert {type: 'json'}
-const ingredientsList = ["white rice","brown rice","black beans","pinto beans","chicken","beef","pork","tofu","seitan","onions","peppers","corn","broccoli","peas","carrots","avocado","zucchini","cheese","queso","pico de gallo","salsa","mild sauce","guacamole","fire sauce","sour cream","chips"]
-
+//TODO: Move these into their own file
+const ingredientsList = ["white rice","brown rice","black beans","pinto beans","chicken","beef","pork","steak","fish","tofu","seitan","onions","peppers","corn","broccoli","peas","carrots","avocado","zucchini","cheese","queso","pico de gallo","salsa","mild sauce","guacamole","fire sauce","sour cream","chips"]
 
 const cursedIngredients = ["ice cubes","nylon","diced plastic","bin juice","milk","a used sock","grated rubber","soap","Axe body spray","a whole lemon","mustard","super glue", "a sense of regret", "apple seeds","mold","tire sealant","scraps of denim","stained underwear","laxatives","lawn clippings","nicotine","Monster energy"]
-//const blursed = ["a free curly fry","an onion ring","an enticing aroma","true happiness"]
-
 
 app.listen((process.env.PORT || 3000), () => {
     console.log(`listening on ${process.env.PORT}`)
@@ -48,22 +46,12 @@ MongoClient.connect(process.env.SERVER)
                 .catch(error => console.error(error))
         })
 
-        //I don't think this is needed; added when having issues with Heroku
-        // app.get('*', (req,res) => {
-        //     burritoesCollection.find().toArray()
-        //         .then(results => {
-        //             res.render(path.join(__dirname, 'index.ejs'), {burritoes: results}) 
-        //         })
-        //         .catch(error => console.error(error))
-        // })
-
-        //Makes a new burrito when user makes a post request
+        //Makes a new burrito when a post request is received
         app.post('/burritoes', (req,res) => {
-            let newBurrito = makeBurrito(req.body)
-            let burr = new Burrito(req.body)
-            burritoesCollection.insertOne(burr)
+            let burrito = new Burrito(req.body)
+            burritoesCollection.insertOne(burrito)
                 .then(result => {
-                    res.render('order',{burrito: burr})
+                    res.render('order',{burrito: burrito})
                 })
                 .catch(error => console.log(error))
         })
@@ -77,6 +65,9 @@ MongoClient.connect(process.env.SERVER)
                     {$set: {ingredients: randomIngredients(data.numIngredients,data.cursed)}},
                     { upsert: true}
                 )
+                    .then(result => {
+                        return res.json('Updated!')
+                    })
                     .catch(error => console.error(error))
             })
           })
@@ -96,30 +87,6 @@ MongoClient.connect(process.env.SERVER)
     })
     .catch(error => console.error(error))
 
-function makeBurrito(data) {
-    let newBurrito = {
-        name: data.name,
-        numIngredients: checkLength(data.numIngredients,Boolean(data.cursed)),
-        orderNum: generateOrderNumber(),
-        cursed: Boolean(data.cursed),
-        version: 1
-    }
-    newBurrito.ingredients = randomIngredients(newBurrito.numIngredients,newBurrito.cursed)
-    return newBurrito;
-}
-
-
-//Check if numIngredients is more than are available. If so, set to max ingredients.
-function checkLength(length, cursed) {
-    if (cursed && length > (ingredientsList.length + cursedIngredients.length)) {
-        return ingredientsList.length + cursedIngredients.length;
-    } 
-    if (!cursed && length > ingredientsList.length) {
-        return ingredientsList.length;
-    }
-    return length;
-}
-
 //Chooses ingredients randomly from list(s). Duplicates not allowed
 function randomIngredients(num,cursed) {
     let selection = []
@@ -133,24 +100,29 @@ function randomIngredients(num,cursed) {
     return picks;
 }
 
-//Generates a 9-digit order number. TODO: check for duplicates in db
-function generateOrderNumber() {
-    return String(Math.floor(10000000*Math.random()))
-}
+
 
 class Burrito{
     constructor(data){
             this.name = data.name;
-            this.orderNum = generateOrderNumber();
+            this.generateOrderNumber();
             this.cursed = Boolean(data.cursed);
-            this.numIngredients = checkLength(data.numIngredients,this.cursed);
+            this.checkLength(data.numIngredients);
             this.version = 1
             this.ingredients = randomIngredients(this.numIngredients,this.cursed)
-        }
+    }
+    //Generates a 9-digit order number. TODO: check for duplicates in db
+    generateOrderNumber() {
+        this.orderNum = String(Math.floor(10000000*Math.random()))
+    }
+    //Check if numIngredients is more than are available. If so, set to max ingredients.
+    checkLength(length, cursed) {
+        this.maxLength = this.cursed ? (ingredientsList.length + cursedIngredients.length) : ingredientsList.length;
+        length > this.maxLength ? this.numIngredients = this.maxLength : this.numIngredients = length
+    }
+
+
 }
 
-let newb = new Burrito({name: 'Alfredo', numIngredients: 5, cursed: 'false'})
-console.log(makeBurrito({name: 'bob', numIngredients: 5, cursed: 'false'}))
-console.log(newb)
-
-console.log(newb.ingredients)
+// let newb = new Burrito({name: 'Alfredo', numIngredients: 51, cursed: 'false'})
+// console.log(newb)

@@ -10,10 +10,9 @@ remake.addEventListener('click', _ => {
       body: JSON.stringify({
         orderNum: orderNum
       })
-
     })
     .then(res => {
-        window.location.reload(true)
+        window.location.assign('/order')
         if (res.ok) return res.json()
       })
   })

@@ -14,9 +14,16 @@ app.use(bodyParser.json())
 app.set('view engine', 'ejs')
 // import ingredients from './ingredients.json' assert {type: 'json'}
 //TODO: Move these into their own file
-const ingredientsList = ["white rice","brown rice","black beans","pinto beans","chicken","beef","pork","steak","fish","tofu","seitan","onions","peppers","corn","broccoli","peas","carrots","avocado","zucchini","cheese","queso","pico de gallo","salsa","mild sauce","guacamole","fire sauce","sour cream","chips"]
+const ingredientsList = ["white rice","brown rice","black beans","pinto beans","chicken","beef","pork","steak","fish","barbacoa","tofu","seitan","onions","peppers","corn","broccoli","peas","carrots","avocado","zucchini","cheese","queso","pico de gallo","salsa","mild sauce","guacamole","fire sauce","sour cream","green beans"]
 
 const cursedIngredients = ["ice cubes","nylon","diced plastic","bin juice","milk","a used sock","grated rubber","soap","Axe body spray","a whole lemon","mustard","super glue", "a sense of regret", "apple seeds","mold","tire sealant","scraps of denim","stained underwear","laxatives","lawn clippings","nicotine","Monster energy"]
+
+const ingredients = {
+    vegan: ["white rice","brown rice","black beans","pinto beans","tofu","seitan","onions","peppers","corn","broccoli","peas","carrots","avocado","zucchini","pico de gallo","salsa","mild sauce","guacamole","fire sauce","green beans"],
+    dairy: ["sour cream","queso","cheese"],
+    meat: ["chicken","beef","pork","steak","fish","barbacoa"],
+    cursed: ["ice cubes","nylon","diced plastic","bin juice","caffeine","a used sock","grated rubber","soap","Axe body spray","a whole lemon","mustard","super glue", "a sense of regret", "apple seeds","mold","tire sealant","scraps of denim","stained underwear","laxatives","lawn clippings","nicotine","Monster energy"]
+}
 
 app.listen((process.env.PORT || 3000), () => {
     console.log(`listening on ${process.env.PORT}`)
@@ -84,45 +91,77 @@ MongoClient.connect(process.env.SERVER)
               })
               .catch(error => console.error(error))
           })
+
+          app.delete('/ingredient', (req, res) => {
+            console.log(req.body)
+            const order = burritoesCollection.findOne({orderNum: req.body.orderNum})
+            .then( data => {
+                console.log(data)
+                // burritoesCollection.findOneAndUpdate(
+                //     {orderNum: req.body.orderNum},
+                //     {$set: {ingredients: randomIngredients(data.numIngredients,data.cursed)}},
+                //     { upsert: true}
+                // )
+                //     .then(result => {
+                //         return res.json('Updated!')
+                //     })
+                //     .catch(error => console.error(error))
+            })
+            return res.json('Updated!')
+          })
     })
     .catch(error => console.error(error))
+    
 
-//Chooses ingredients randomly from list(s). Duplicates not allowed
-function randomIngredients(num,cursed) {
-    let selection = []
-    cursed ? selection = [...ingredientsList,...cursedIngredients] : selection = [...ingredientsList]
-    let picks = []
-    for (let i=0;i<num;i++) {
-        let n=Math.floor(Math.random()*selection.length)
-        picks.push(selection[n])
-        selection.splice(n,1);
-    }
-    return picks;
-}
+
 
 
 
 class Burrito{
+    //Holds all the information about a burrito
     constructor(data){
             this.name = data.name;
             this.generateOrderNumber();
             this.cursed = Boolean(data.cursed);
             this.checkLength(data.numIngredients);
             this.version = 1
-            this.ingredients = randomIngredients(this.numIngredients,this.cursed)
+            this.ingredients = this.randomIngredients(this.numIngredients)
     }
     //Generates a 9-digit order number. TODO: check for duplicates in db
     generateOrderNumber() {
         this.orderNum = String(Math.floor(10000000*Math.random()))
     }
     //Check if numIngredients is more than are available. If so, set to max ingredients.
-    checkLength(length, cursed) {
+    checkLength(length) {
         this.maxLength = this.cursed ? (ingredientsList.length + cursedIngredients.length) : ingredientsList.length;
         length > this.maxLength ? this.numIngredients = this.maxLength : this.numIngredients = length
     }
-
-
+    //Chooses ingredients randomly from list(s)
+    randomIngredients(num) {
+        let selection = []
+        let picks = []
+            //Make a copy of all possible ingredients
+        this.cursed ? selection = [...ingredientsList,...cursedIngredients] : selection = [...ingredientsList]
+        //Pick one random element. Push to 'picks', then remove from 'selection' to prevent duplicates.
+        for (let i=0;i<num;i++) {
+            let n=Math.floor(Math.random()*selection.length)
+            picks.push(selection[n])
+            selection.splice(n,1);
+        }
+        return picks;
+    }
+    asssembleIngredientChoices() {
+        //TODO: have this method assemble list of valid ingredients. Add checkboxes for vegan/vegetarian on order form. Use array.concat(ingredients["vegan"],ingredients["cursed"]) etc
+    }
+    deleteIngredient(ingredient) {
+        //Delete one ingredient from this burrito's contents
+        let n = this.ingredients.indexOf(ingredient);
+        console.log(` n = ${n}`)
+        this.ingredients.splice(n,1);
+        console.log(`New list: ${this.ingredients}`)
+    }
 }
 
-// let newb = new Burrito({name: 'Alfredo', numIngredients: 51, cursed: 'false'})
+// let newb = new Burrito({name: 'Alfredo', numIngredients: 11, cursed: 'false'})
 // console.log(newb)
+// newb.deleteIngredient(newb.ingredients[0])

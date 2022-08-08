@@ -37,3 +37,5 @@ deleteButton.addEventListener('click', _ => {
             }
         })
 })
+
+//trashIngredient.addEventListener()

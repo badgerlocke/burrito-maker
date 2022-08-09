@@ -3,7 +3,8 @@
 //      Add 'back' button to order page
 
 const express = require('express');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const { delimiter } = require('ejs');
 const app = express();
 const MongoClient = require('mongodb').MongoClient
 require('dotenv').config()
@@ -93,21 +94,27 @@ MongoClient.connect(process.env.SERVER)
           })
 
           app.delete('/ingredient', (req, res) => {
-            console.log(req.body)
             const order = burritoesCollection.findOne({orderNum: req.body.orderNum})
             .then( data => {
-                console.log(data)
-                // burritoesCollection.findOneAndUpdate(
-                //     {orderNum: req.body.orderNum},
-                //     {$set: {ingredients: randomIngredients(data.numIngredients,data.cursed)}},
-                //     { upsert: true}
-                // )
-                //     .then(result => {
-                //         return res.json('Updated!')
-                //     })
-                //     .catch(error => console.error(error))
+                // console.log(data)
+                let delIndex = data.ingredients.indexOf(req.body.ingredient)
+                // // console.log(`Del index: ${delIndex} for ${req.body.ingredient}`)
+                if (delIndex > 0) { 
+                    data.ingredients.splice(delIndex,1)
+                }
+                // console.log(data.ingredients)
+                // data.deleteIngredient(req.body.ingredient)
+                burritoesCollection.findOneAndUpdate(
+                    {orderNum: req.body.orderNum},
+                    {$set: {ingredients: data.ingredients}},
+                    { upsert: true}
+                )
+                    .then(result => {
+                        return res.json('Updated!')
+                    })
+                    .catch(error => console.error(error))
             })
-            return res.json('Updated!')
+
           })
     })
     .catch(error => console.error(error))
@@ -155,9 +162,12 @@ class Burrito{
     }
     deleteIngredient(ingredient) {
         //Delete one ingredient from this burrito's contents
-        let n = this.ingredients.indexOf(ingredient);
-        console.log(` n = ${n}`)
-        this.ingredients.splice(n,1);
+        //!This would work if burritoes were staying in server memory, but since they're getting sent to a DB, functions aren't stored
+        let delIndex = this.ingredients.indexOf(ingredient);
+        console.log(` n = ${delIndex}`)
+        if (delIndex > 0) {        
+            this.ingredients.splice(delIndex,1);
+        }
         console.log(`New list: ${this.ingredients}`)
     }
 }

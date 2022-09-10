@@ -17,7 +17,11 @@
             <input type="text" placeholder="Your name" name="name" required pattern="^[\w\d]{1,}">
             <input type="text" placeholder="Number of ingredients" name="numIngredients" required pattern="\d+">
             <p>Would you like to make it cursed?</p>
-            <input type="checkbox" name="cursed" value="false"><span>Yes</span>
+            <input type="checkbox" name="cursed" value="true"><span>Yes</span>
+            <h4>Options</h4>
+            <input type="checkbox" name="vegan" value="false"><span>Vegan</span>
+            <input type="checkbox" name="vegetarian" value="false"><span>Vegetarian</span>
+            <input type="checkbox" name="uncursed" value="true"><span>Uncursed</span>
             <br>
             <br>
             <br>
@@ -32,9 +36,9 @@
             <% let max = burritoes.length %>
             <% for (let i=max-1; i > (max-5); i--) { %>
                 <% if (burritoes[i].cursed) {  %>
-                    <p><%= `A cursed burrito with ${burritoes[i].numIngredients} ingredients for ${burritoes[i].name}` %> </p>
+                    <p><%= `A cursed burrito with ${burritoes[i].ingredients.length} ingredients for ${burritoes[i].name}` %> </p>
                 <% } else { %>
-                    <p><%= `An uncursed burrito with ${burritoes[i].numIngredients} ingredients for ${burritoes[i].name}`%></p>
+                    <p><%= `An uncursed burrito with ${burritoes[i].ingredients.length} ingredients for ${burritoes[i].name}`%></p>
                 <% } %>
             <% } %>
         </ol>

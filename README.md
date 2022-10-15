@@ -10,6 +10,7 @@ http://burrito-maker.herokuapp.com/
 
 Todos:
 
+Make the front end pretty  
 Look up past burritos  
 Set cursed to be default  
 Move burrito-making code into its own file  
